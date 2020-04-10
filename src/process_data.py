@@ -163,16 +163,16 @@ def parse_args_and_run(argv: list):
             help='Path to write csv output file to - if not included, prints to stdout',
             dest='output_fpath', default=def_out_path)
     parser.add_argument('--max-energy', type=float,
-            help='maximum energy in [eV] for slowing down equations - for defining lethargy',
+                        help='maximum energy in [eV] for slowing down equations - for defining lethargy. Defalut: 2E4',
             dest='max_energy_eV', default=def_max_energy_eV)
     parser.add_argument('--min-energy', type=float,
-            help='minimum energy in [eV] for slowing down equations - for defining lethargy',
+                        help='minimum energy in [eV] for slowing down equations - for defining lethargy. Default: 1.0',
             dest='min_energy_eV', default=def_min_energy_eV)
     parser.add_argument('-n', '--num-gridpoints', type=int,
-            help='desired numbr of points on lethargy grid',
+                        help='desired number of points on lethargy grid: Default: 6E5',
             dest='gridsize', default=def_gridsize)
     parser.add_argument('-d', '--display', action='store_true',
-            help='plot cross sections', dest='display')
+                        help='if flag present, generates cross section plots', dest='display')
     args = parser.parse_args()
 
     # file path specification
