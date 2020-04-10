@@ -1,13 +1,12 @@
 <material_spec>
     
     <nuclear_data>
-        <nuclide name="H1"    ZAID="1001"   mass_ratio_n="0.9992"  potential_scat_b="20.478" xs_path="data/H1.csv"/>  
+        <nuclide name="H1"    ZAID="1001"   mass_ratio_n="0.9992"  potential_scat_b="20.478" xs_path="data/H1.csv" />  
         <nuclide name="U238"  ZAID="92238"  mass_ratio_n="236.006" potential_scat_b="11.293" xs_path="data/U238.csv"/>  
     </nuclear_data>
 
-    <material>
-    </material>
+    <material name="homogenized" absorber="H1" fuel="U238" number_density_ratio="1.0" />
 
-    <reactor name="my_homogenous_reactor" type="homogenous" material=""/>
+    <reactor name="my_homogenous_reactor" type="homogenous" material="homogenized"/>
 
 </material_spec>
