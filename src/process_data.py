@@ -144,22 +144,22 @@ def smart_open(filename=None):
         if fh is not sys.stdout:
             fh.close()
 
-def build_xs_directory(input_fpath, max_en_eV, min_en_eV, num_points):
+def build_xs_directory(input_fpath, nuc_name, max_en_eV, min_en_eV, num_points):
     # read xs and run interpolation
-    nuc_name = os.path.splitext(os.path.basename(input_fpath))[0]
     xs_directory = read_xs_mesh(input_fpath)
     for rxn , xs in xs_directory.items():
         xs_directory[rxn] = \
             interpolate_xs_equal_leth(xs, max_en_eV=max_en_eV, min_en_eV=min_en_eV, num_points=num_points)
 
-    return nuc_name, xs_directory
+    return xs_directory
 
 def run(args):
     # file path specification
     input_fpath = Path(args.input_fpath)
+    nuc_name = os.path.splitext(os.path.basename(input_fpath))[0]
 
     # read and intrpolate xs
-    nuc_name, xs_directory = build_xs_directory(input_fpath, args.max_en_eV, args.min_en_eV, args.numpoints)
+    xs_directory = build_xs_directory(input_fpath, nuc_name, args.max_en_eV, args.min_en_eV, args.numpoints)
 
     # display
     if args.display:
