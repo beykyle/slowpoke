@@ -1,5 +1,0 @@
-<nuclear_data>
-    <nuclide name="H1"    ZAID="1001"   mass_ratio_n="0.9992"  potential_scat_b="20.478" xs_path="H1.csv"/>  
-    <nuclide name="U238"  ZAID="92238"  mass_ratio_n="236.006" potential_scat_b="11.293" xs_path="U238.csv"/>  
-    <nuclide name="O16"   ZAID="8016"   mass_ratio_n="15.858"  potential_scat_b="3.888"  xs_path=""/>  
-</nuclear_data>
