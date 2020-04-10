@@ -144,6 +144,55 @@ def smart_open(filename=None):
         if fh is not sys.stdout:
             fh.close()
 
+def build_xs_directory(input_fpath, max_en_eV, min_en_eV, num_points):
+    # read xs and run interpolation
+    nuc_name = os.path.splitext(os.path.basename(input_fpath))[0]
+    xs_directory = read_xs_mesh(input_fpath)
+    for rxn , xs in xs_directory.items():
+        xs_directory[rxn] = \
+            interpolate_xs_equal_leth(xs, max_en_eV=max_en_eV, min_en_eV=min_en_eV, num_points=num_points)
+
+    return nuc_name, xs_directory
+
+def run(args):
+    # file path specification
+    input_fpath = Path(args.input_fpath)
+
+    # read and intrpolate xs
+    nuc_name, xs_directory = build_xs_directory(input_fpath, args.max_en_eV, args.min_en_eV, args.numpoints)
+
+    # display
+    if args.display:
+        plot_all(xs_directory, nuc_name)
+
+    # output
+    output_fpath = args.output_fpath
+    if output_fpath:
+        output_fpath = Path(output_fpath) / (str(nuc_name) + "-equal-leth-ufgrid.csv")
+
+    with smart_open(output_fpath) as fh:
+        # get common grids from arbitrary reacton in directory
+        energy_grid = xs_directory[Reactions.elastic_sc].E
+        leth_grid = xs_directory[Reactions.elastic_sc].leth
+        elastic = xs_directory[Reactions.elastic_sc].xs
+        capture = xs_directory[Reactions.rad_cap].xs
+        groups = args.numpoints
+
+        # iterate through the table and print in csv format
+        print("{}, {}, {}, {}".format(
+                                      "Energy [eV]",
+                                      "Lethargy",
+                                      rxn_str[Reactions.elastic_sc] + " [b]",
+                                      rxn_str[Reactions.rad_cap] + " [b]"),
+              file=fh)
+
+        for i in range(0,groups):
+            print("{:1.8e}, {:1.8e}, {:1.8e}, {:1.8e}".format(
+                                          energy_grid[i],
+                                          leth_grid[i],
+                                          elastic[i],
+                                          capture[i]),
+                  file=fh)
 
 def parse_args_and_run(argv: list):
 
@@ -164,59 +213,20 @@ def parse_args_and_run(argv: list):
             dest='output_fpath', default=def_out_path)
     parser.add_argument('--max-energy', type=float,
                         help='maximum energy in [eV] for slowing down equations - for defining lethargy. Defalut: 2E4',
-            dest='max_energy_eV', default=def_max_energy_eV)
+            dest='max_en_eV', default=def_max_energy_eV)
     parser.add_argument('--min-energy', type=float,
                         help='minimum energy in [eV] for slowing down equations - for defining lethargy. Default: 1.0',
-            dest='min_energy_eV', default=def_min_energy_eV)
+            dest='min_en_eV', default=def_min_energy_eV)
     parser.add_argument('-n', '--num-gridpoints', type=int,
                         help='desired number of points on lethargy grid: Default: 6E5',
-            dest='gridsize', default=def_gridsize)
+            dest='numpoints', default=def_gridsize)
     parser.add_argument('-d', '--display', action='store_true',
                         help='if flag present, generates cross section plots', dest='display')
     args = parser.parse_args()
 
-    # file path specification
-    input_fpath = Path(args.input_fpath)
-    output_fpath = args.output_fpath
-    nuc_name = os.path.splitext(os.path.basename(input_fpath))[0]
-    if output_fpath:
-        output_fpath = Path(output_fpath) / (str(nuc_name) + "-equal-leth-ufgrid.csv")
+    run(args)
 
 
-    # run interpolation
-    xs_directory = read_xs_mesh(input_fpath)
-    for rxn , xs in xs_directory.items():
-        xs_directory[rxn] = \
-            interpolate_xs_equal_leth(xs, max_en_eV=args.max_energy_eV, min_en_eV=args.min_energy_eV, num_points=args.gridsize)
-
-    # display
-    if args.display:
-        plot_all(xs_directory, nuc_name)
-
-    # output
-    with smart_open(output_fpath) as fh:
-        # get common grids from arbitrary reacton in directory
-        energy_grid = xs_directory[Reactions.elastic_sc].E
-        leth_grid = xs_directory[Reactions.elastic_sc].leth
-        elastic = xs_directory[Reactions.elastic_sc].xs
-        capture = xs_directory[Reactions.rad_cap].xs
-        groups = args.gridsize
-
-        # iterate through the table and print in csv format
-        print("{}, {}, {}, {}".format(
-                                      "Energy [eV]",
-                                      "Lethargy",
-                                      rxn_str[Reactions.elastic_sc] + " [b]",
-                                      rxn_str[Reactions.rad_cap] + " [b]"),
-              file=fh)
-
-        for i in range(0,groups):
-            print("{:1.8e}, {:1.8e}, {:1.8e}, {:1.8e}".format(
-                                          energy_grid[i],
-                                          leth_grid[i],
-                                          elastic[i],
-                                          capture[i]),
-                  file=fh)
 
 if __name__ == "__main__":
     parse_args_and_run(sys.argv)
