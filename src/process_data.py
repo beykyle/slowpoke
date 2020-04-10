@@ -160,7 +160,7 @@ def parse_args_and_run(argv: list):
     parser.add_argument('-i', '--input',
             help='Path to cross section ".csv" file', dest='input_fpath', required=True)
     parser.add_argument('-o', '--output',
-            help='Path to write csv output file to',
+            help='Path to write csv output file to - if not included, prints to stdout',
             dest='output_fpath', default=def_out_path)
     parser.add_argument('--max-energy', type=float,
             help='maximum energy in [eV] for slowing down equations - for defining lethargy',
