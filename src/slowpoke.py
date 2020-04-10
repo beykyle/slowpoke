@@ -24,19 +24,17 @@ class Grid:
 
 def validate_xml_path(input_path):
     if not input_path.is_file():
-        print("Input path must point to a valid xml file. Example format:")
-        print("<nuclear_data>")
-        print("  <nuclide name=\"H1\"    ZAID=\"1001\"   mass_ratio_n=\"0.9992\"  potential_scat_b=\"20.478\" xs_path=\"data/H1.csv\" />")
-        print("</nuclear_data>")
+        print("Input path must point to a valid xml file, completely specifying a material")
         exit(1)
 
 def build_nuclide_data(input_path, grid):
     tree = et.parse(str(input_path))
     root = tree.getroot()
+    nuclear_data_node = root.find("nuclear_data")
     nuclides = []
-    base_path = input_path.parents[0]
+    base_path = input_path.parents[1]
     print("Base data path: " + str(base_path))
-    for nuclide_node in root.findall('nuclide'):
+    for nuclide_node in nuclear_data_node.findall('nuclide'):
         nuclides.append(Nuclide(nuclide_node, base_path, grid))
 
     return nuclides
