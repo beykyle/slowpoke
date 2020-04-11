@@ -24,9 +24,16 @@ def validate_xs_path(xs_path):
 
 class Nuclide:
     def __init__(self, node, base_path, grid):
+        # read basic info
         self.name = node.get("name")
         self.ZAID = float(node.get("ZAID"))
         self.mass_n = float(node.get("mass_ratio_n"))
+
+        # pre-calculate values used in slowing down
+        self.alpha = ((self.mass_n - 1) / (self.mass_n + 1))**2
+        self.epsilon = np.log(1/self.alpha)
+
+        # read and interpolate xs data to grid
         self.pot_scatterxs_b  = float(node.get("potential_scat_b"))
         relative_xs_path = Path(node.get("xs_path"))
         data_path = base_path / relative_xs_path
