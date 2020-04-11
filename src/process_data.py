@@ -42,6 +42,12 @@ class CrossSection:
         self.rxn = rxn
         self.leth = np.zeros(len(self.E))
 
+    def indexFromLeth(leth):
+        return (np.abs(self.leth - leth)).argmin()
+
+    def indexFromEnergy(energy):
+        return  (np.abs(self.E - energy)).argmin()
+
 def read_xs_mesh(fpath):
     # intialize data structures
     energy = []
