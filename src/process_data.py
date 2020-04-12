@@ -127,6 +127,7 @@ def fig_setup():
     return fig , ax
 
 def plot_all(xs_directory, name):
+    # by energy
     f,a = fig_setup()
     for rxn , xs in xs_directory.items():
         plt.loglog(xs.E , xs.xs, label=rxn_str[rxn])
@@ -135,6 +136,16 @@ def plot_all(xs_directory, name):
     a.tick_params(size=10, labelsize=20)
     plt.legend()
     plt.savefig(name + "-xs-plot.png")
+
+    # by lethargy
+    f,a = fig_setup()
+    for rxn , xs in xs_directory.items():
+        plt.semilogy(xs.leth , xs.xs, label=rxn_str[rxn])
+    plt.xlabel("Lethargy", fontsize=20)
+    plt.ylabel("Cross Section [b]", fontsize=20)
+    a.tick_params(size=10, labelsize=20)
+    plt.legend()
+    plt.savefig(name + "-xs-leth-plot.png")
 
 # for output
 @contextlib.contextmanager
