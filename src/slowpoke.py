@@ -22,6 +22,23 @@ class Grid:
         self.min = gmin
         self.size = sz
 
+class Simulation:
+    def __init__(nuclides : list, number_densities: list):
+        nuclides = self.nuclides
+        number_densities = self.number_densities
+
+class Homogenized2SpeciesSimulation():
+    def __init__(self, moderator, absorber, ratios):
+        self.moderator = moderator
+        self.absorber = absorber
+        self.ratios = ratios
+        self.problems = len(ratios)
+
+    def get_problem_data(idx: int):
+        ratio = self.ratios[idx]
+        return Simulation([absorber, moderator] , [1. , ratio])
+
+
 def validate_xml_path(input_path):
     if not input_path.is_file():
         print("Input path must point to a valid xml file, completely specifying a material")
@@ -39,6 +56,11 @@ def build_nuclide_data(input_path, grid):
 
     return nuclides
 
+def slow_down(simulation):
+    pass
+
+def build_material(nuclides, input_path):
+    pass
 
 def parse_args_and_run(argv: list):
 
