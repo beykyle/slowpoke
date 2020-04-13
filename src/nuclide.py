@@ -12,7 +12,7 @@ from process_data import CrossSection
 from process_data import build_xs_directory
 
 nuc_directory = {
-    "h1"   : 1001,
+    "H1"   : 1001,
     "O16"  : 8016,
     "U238" : 92238
 }
