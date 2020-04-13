@@ -1,2 +1,3 @@
 # slowpoke
-A simple python tool for performing ultrafine-group neutron slowing down calculations to generate multigroup cross section libraries
+A python tool for demonstrating how ultrafine-group neutron slowing down calculations are used to generate multigroup cross section libraries 
+for use in whole-core reactor simulations
