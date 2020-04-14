@@ -157,8 +157,13 @@ def slow_down(simulation, boundary=BoundaryCondition.asymptotic_scatter_source):
     # run the solver and retun the flux
     return(solver(sig_s, sig_t, alpha , u, phi1))
 
-def plot_flux(energy, flux):
-    pass
+def plot_flux(energy, flux, name):
+    f,a = process_data.fig_setup()
+    plt.semilogx(energy, flux)
+    plt.xlabel("Energy [eV]", fontsize=20)
+    plt.ylabel("Scalar Flux [a.u.]", fontsize=20)
+    a.tick_params(size=10, labelsize=20)
+    plt.savefig(name + ".png")
 
 def run_problem(material, display=False):
     for i in range(material.problems):
@@ -169,7 +174,8 @@ def run_problem(material, display=False):
 
     if display:
         for i in range(material.problems):
-            plot_flux(material.egrid , material.fluxes[i])
+            name = "problem_" + str(i)
+            plot_flux(material.egrid , material.fluxes[i], name)
 
 
 def parse_args_and_run(argv: list):
