@@ -1,6 +1,7 @@
 __author__ = "Kyle Beyer"
 __email__ = "beykyle@umich.edu"
 
+import numpy as np
 from pathlib import Path
 import xml.etree.ElementTree as et
 
