@@ -77,28 +77,33 @@ def build_material(root, nuclides):
     # get number density ratios
     mod_abs_ratio_str = mat_node.get("mod_to_abs_ratio")
     mod_abs_ratio = []
-    if (mod_abs_ratio != None):
+    if (mod_abs_ratio_str != None):
         mod_abs_ratio = [float(mod_abs_ratio_str)]
     else:
-        ratio_node = mat_node.find("mod_abs_ratio")
+        ratio_node = mat_node.find("mod_to_abs_ratio")
         rmin = float(ratio_node.get("min"))
-        rmax = float(ratio_node.get("min"))
-        rnum = float(ratio_node.get("min"))
+        rmax = float(ratio_node.get("max"))
+        rnum = int(ratio_node.get("points"))
         mod_abs_ratio = np.linspace(rmin, rmax, rnum).tolist()
 
     return Homogenized2SpeciesSimulation(moderator, absorber, mod_abs_ratio)
 
 
+def solver(sig_s, sig_t , alpha, u):
+    return np.zeros(len(sig_s[0]))
+
 def slow_down(simulation):
+    # calculate all cross sections and lethargy grid
     nucs = simulation.nuclides
     nums_dens = simulation.number_densities
-    sig_s = sum([ N * nuc.xs[RXN.elastic_sc].xs for N , nuc in zip(nums_dens, nucs)])
-    sig_a = sum([ N * nuc.xs[RXN.rad_cap].xs    for N , nuc in zip(nums_dens, nucs)])
-    sig_t = sig_s + sig_a
-    u = nucs[0].xs[RXN.elastic_sc].leth
 
-    print(u)
-    print(len(u))
+    alpha = [nuc.alpha for nuc in nucs]
+    sig_s = [ N * nuc.xs[RXN.elastic_sc].xs for N , nuc in zip(nums_dens, nucs)]
+    sig_a = [ N * nuc.xs[RXN.rad_cap].xs    for N , nuc in zip(nums_dens, nucs)]
+    sig_t = sig_s + sig_a
+    u = nucs[0].xs[RXN.elastic_sc].leth_boundaries
+
+    return(solver(sig_s, sig_t, alpha , u))
 
 
 def run_problem(material):
