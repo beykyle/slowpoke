@@ -10,6 +10,7 @@ import argparse
 import numpy as np
 import xml.etree.ElementTree as et
 from pathlib import Path
+from enum import Enum
 
 """
 This module performs numerical neutron slowing down calculations for homogenous mixtures
@@ -17,6 +18,9 @@ This module performs numerical neutron slowing down calculations for homogenous 
 
 from nuclide import Nuclide
 from process_data import Reactions as RXN
+
+class BoundaryCondition(Enum):
+    asymptotic_scatter_source = 1
 
 class Grid:
     def __init__(self, gmax, gmin, sz):
@@ -91,28 +95,74 @@ def build_material(root, nuclides):
     return Homogenized2SpeciesMaterial(moderator, absorber, mod_abs_ratio)
 
 
-def solver(sig_s, sig_t , alpha, u):
-    pass
+def solver(sig_s : list, sig_t :list , alpha : list , u , phi1 : float):
+    """
+    Numerical slowing down solver for arbirary number of nuclides and arbitrary lethargy grid
+    @param sig_s  macroscopic scatter xs: list of np arrays, 1 for each nuclide. Size of each array = num groups
+    @param sig_t  macroscopic total xs: list of np arrays, 1 for each nuclide. Size of each array = num groups
+    @param alpha  max fractional energy loss from elastic scatter: list of floats, 1 for each nuclide
+    @ param u     lethargy grid: np array, size = size of cross section arrays + 1
+    @ phi1        flux in first lethargy group
+    """
+    p = np.zeros(len(u) - 1)
+    p[0] = phi1
+    for i in range(1,len(p)):
+        du = u[i] - u[i-1]
+        numerator = 0.0
+        # calculate in-scatter contribution for each nuclide
+        for s , a in zip(sig_s, alpha):
+            # calculate lowest group that can scatter into current group for current nuclide
+            min_inscatter_group = int(round(i - np.log(1/a) / du))
+            n = min_inscatter_group if min_inscatter_group > 0 else 0
+
+            # increment numerator by the in-scatter contribution from each group
+            # from n to i - 1
+            for l in range(n, i-1):
+                numerator = numerator + s[l] * p[l] * (np.exp(u[l]) - np.exp(u[l-1])) * (np.exp(- u[i-1]) - np.exp(- u[i]) )
+
+        # calculate denominator
+        # sum group i in scattering cross section over nuclides
+        sum_sig_s = sum( [s[i]/(1 - alpha[j]) for j, s in enumerate(sig_s)] )
+        # sum group i total cross section over nuclides
+        sum_sig_t = sum( [s[i] for s in sig_t] )
+        # calculate flux in currrent group
+        p[i] = numerator / ( (du) * (sum_sig_t) - (sum_sig_s) * (du - 1 + np.exp(-du)) )
 
 
-def slow_down(simulation):
-    # calculate all cross sections and lethargy grid
+def slow_down(simulation, boundary=BoundaryCondition.asymptotic_scatter_source):
+    # get problem data
     nucs = simulation.nuclides
     nums_dens = simulation.number_densities
 
+
+    # calculate macroscopic xs
     alpha = [nuc.alpha for nuc in nucs]
     sig_s = [ N * nuc.xs[RXN.elastic_sc].xs for N , nuc in zip(nums_dens, nucs)]
     sig_a = [ N * nuc.xs[RXN.rad_cap].xs    for N , nuc in zip(nums_dens, nucs)]
+    sig_p = [ N * nuc.pot_scatterxs_b for N , nuc in zip(nums_dens, nucs)  ]
     sig_t = sig_s + sig_a
+
+    # get lethargy grid
     u = nucs[0].xs[RXN.elastic_sc].leth_boundaries
 
-    return(solver(sig_s, sig_t, alpha , u))
+    # calculate group 1 flux
+    phi1 = 0
+    if ( boundary == BoundaryCondition.asymptotic_scatter_source ):
+        du = u[1] - u[0]
+        sum_sigp =  sum( [s   /(1 - alpha[i]) for i, s in enumerate(sig_p)] )
+        sum_sig_s = sum( [s[0]/(1 - alpha[i]) for i, s in enumerate(sig_s)] )
+        sum_sig_t = sum( [s[0] for s in sig_t] )
+        ph1 = sum_sigp / ((du) * (sum_sig_t) - (sum_sig_s) * (du - 1 + np.exp(-du)) )
+
+    # run the solver and retun the flux
+    return(solver(sig_s, sig_t, alpha , u, phi1))
 
 def plot_flux(energy, flux):
     pass
 
 def run_problem(material, display=False):
     for i in range(material.problems):
+        print("Running problem 1/" + str(material.problems))
         simulation = material.get_problem_data(i)
         flux = slow_down(simulation)
         material.append_result(flux)
