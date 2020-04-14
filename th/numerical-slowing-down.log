@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2020.1.9)  14 APR 2020 17:42
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2020.1.9)  14 APR 2020 18:08
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -461,13 +461,8 @@ Overfull \hbox (37.66858pt too wide) detected at line 82
 []\OML/cmm/m/it/10 r^^[[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 u\OT1/cmr/m/n/10 ) + \OML/cmm/m/it/10 ^^[[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 u\OT1/cmr/m/n/10 )[]\OML/cmm/m/it/10 ^^^\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 u\OT1/cmr/m/n/10 ) = [][] \OML/cmm/m/it/10 ^^[[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 u[]\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 ^^^\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 u[]\OT1/cmr/m/n/10 )[]\OML/cmm/m/it/10 du[] \OT1/cmr/m/n/10 + [][] \OML/cmm/m/it/10 r^^[[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 u[]\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 ^^^\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 u[]\OT1/cmr/m/n/10 )[]\OML/cmm/m/it/10 du[]:
  []
 
-
-Overfull \hbox (25.60513pt too wide) detected at line 108
-[]
- []
-
 [2]
-Overfull \hbox (69.52126pt too wide) detected at line 155
+Overfull \hbox (72.6891pt too wide) detected at line 155
 []
  []
 
@@ -495,7 +490,7 @@ Here is how much of TeX's memory you used:
  1141 hyphenation exceptions out of 8191
  32i,19n,36p,10429b,275s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb>
-Output written on numerical-slowing-down.pdf (6 pages, 145082 bytes).
+Output written on numerical-slowing-down.pdf (6 pages, 144748 bytes).
 PDF statistics:
  71 PDF objects out of 1000 (max. 8388607)
  50 compressed objects within 1 object stream

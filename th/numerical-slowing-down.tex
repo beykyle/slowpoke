@@ -84,24 +84,24 @@ Our system is parameterized by:
         This is the analytical equation we want to solve. 
         To do so, let's define an equal lethargy grid, with $I-1$ groups, 
         numbered from 1 through $I$. 
-        Each group has width $\Delta u << \epsilon_a < \epsilon_m$, 
+        Each group has width $\Delta u_i << \epsilon_a < \epsilon_m$, 
         and lethargy is tabulated at each of the $I$ group edges,
         from $u_0 = 0; E_0 = E_\text{max}$
         to some $u_I  = \log{(E_\text{max}/E_\text{min})}$. 
-        Lethargy group $i$ starts at $u_{i-1} = (i-1) \Delta u$ and goes to $u_i = i \Delta u$.
         Let's also define a lethargy group averaging operator over lethargy group $i$: 
-        $\int_{(i-1)\Delta u}^{i \Delta u} (*) \; du$. 
+        $\int_{u_{i-1}}^{u_i}  $. 
+             
 
         Applying this operator to \ref{eqn}:
 
          \begin{align}
-            \int_{(i-1)\Delta u}^{i \Delta u} 
+             \int_{u_{i-1}}^{u_i} 
             \big(r \sigma_t^a(u) + \sigma_t^m(u) \big)  \phi(u) \; du &= 
-            \int_{(i-1)\Delta u}^{i \Delta u} 
+             \int_{u_{i-1}}^{u_i} 
             \bigg(  
             \int_{u - \epsilon_a}^{u} \sigma_s^a(u')\phi(u') \frac{e^{-(u-u')}}{1 - \alpha_a}du'  
             \bigg)  \; du \\ &+ 
-            \int_{(i-1)\Delta u}^{i \Delta u} 
+             \int_{u_{i-1}}^{u_i} 
             \bigg(  
             \int_{u - \epsilon_m}^{u} r \sigma_s^m(u')\phi(u') \frac{e^{-(u-u')}}{1 - \alpha_m}du'.
             \bigg)  \; du 
@@ -118,9 +118,9 @@ Our system is parameterized by:
          First, we write the collision term:
 
           \begin{equation} 
-            \int_{(i-1)\Delta u}^{i \Delta u} 
+             \int_{u_{i-1}}^{u_i} 
             \big(r \sigma_t^a(u) + \sigma_t^m(u) \big)  \phi(u) \; du = 
-            \big( r \sigma_{ti}^a + \sigma_{ti}^m  \big) \phi_i \Delta u
+            \big( r \sigma_{ti}^a + \sigma_{ti}^m  \big) \phi_i \Delta u_i
           \end{equation}
 
           The in-scattering term into group $i$ will be a sum of contributions from lesser lethargy groups $l$.
@@ -138,7 +138,7 @@ Our system is parameterized by:
             \bigg(  
             \int_{u - \epsilon_a}^{u} \sigma_s^a(u')\phi(u') \frac{e^{-(u-u')}}{1 - \alpha_a}du'  
             \bigg)  \; du + 
-            \int_{(i-1)\Delta u}^{i \Delta u} 
+            \int_{(i-1)\Delta u_i}^{i \Delta u_i} 
             \bigg(  
             \int_{u - \epsilon_m}^{u} r \sigma_s^m(u')\phi(u') \frac{e^{-(u-u')}}{1 - \alpha_m}du'.
         \bigg)  \; du  = \\
@@ -164,39 +164,39 @@ Our system is parameterized by:
             \bigg)  \; du  \\ =   
             \frac{r \sigma_{si}^m \phi_i}{1-\alpha_m} 
             \int_{u_{i-1}}^{u_{i}} du e^{-u} \int_{u_{i-1}}^{u_{i}} du' e^{u'} \\ =
-            \frac{r \sigma_{si}^m \phi_i}{1-\alpha_m} \big( \Delta u -1 + e^{-\Delta u_i} \big)
+            \frac{r \sigma_{si}^m \phi_i}{1-\alpha_m} \big( \Delta u_i -1 + e^{-\Delta u_i} \big)
          \end{align}
 
          The absorber same-group scattering term can be derived identically:
 
          \begin{equation}
-            \frac{\sigma_{si}^m \phi_i}{1-\alpha_a} \big( \Delta u -1 + e^{-\Delta u_i} \big)
+            \frac{\sigma_{si}^m \phi_i}{1-\alpha_a} \big( \Delta u_i -1 + e^{-\Delta u_i} \big)
          \end{equation}
 
 
          We can rewrite the bounds of the other integral, $u \in [u_{i-1} - \epsilon_{j}, u_{i-1}]$, as \\
-         $l \in [ i - \frac{\epsilon_j}{\Delta u},i-1]$.  
+         $l \in [ i - \frac{\epsilon_j}{\Delta u_i},i-1]$.  
          We must be careful here, however, if our moderator is hydrogen, 
-         it is likely that $\frac{\epsilon_m}{\Delta u} > I $.
+         it is likely that $\frac{\epsilon_m}{\Delta u_i} > I $.
          In other words, as we aren't modeling thermal or fission spectrum energies, 
          the lethargy range of our problem is likely less than the maximum lethargy gain from
          our presumably hydrogenous moderator. 
          For the purposes of this analysis, we will assume such, and thus take the lower bound 
          of this range to be group 1, as group 1 can scatter into every other group.
 
-         For the absorber however, most likely dozens to hundreds of $\epsilon_a$'s will fit 
+         For the absorber however, most likely dozens to hundreds
          into the lethargy range of interest; each group will only have in-scatter
          from a limited subset of lower lethargy groups. 
          The range
-         $l \in [ i - \frac{\epsilon_a}{\Delta u},i-1]$ will be useful, 
-         except for in the first  $\frac{\epsilon_a}{\Delta u}$ groups.
+         $l \in [ i - \frac{\epsilon_a}{\Delta u_i},i-1]$ will be useful, 
+         except for in the first  $\frac{\epsilon_a}{\Delta u_i}$ groups.
          We can define 
 
          \begin{equation}
              n = 
              \begin{cases} 
-              i - \frac{\epsilon_a}{\Delta u} & \frac{\epsilon_a}{\Delta u} + 1< i \\
-              0 & \frac{\epsilon_a}{\Delta u}  + 1 > i   
+              i - \frac{\epsilon_a}{\Delta u_i} & \frac{\epsilon_a}{\Delta u_i} + 1< i \\
+              0 & \frac{\epsilon_a}{\Delta u_i}  + 1 > i   
              \end{cases}
          \end{equation}
 
@@ -244,8 +244,8 @@ Our system is parameterized by:
                 \int_{u - \epsilon_m}^{u_{i-1}} r \sigma_s^m(u')\phi(u') \frac{e^{-(u-u')}}{1 - \alpha_m}du' +
                 \int_{u_{i-1}}^{u} r \sigma_s^m(u')\phi(u') \frac{e^{-(u-u')}}{1 - \alpha_m}du'.
             \bigg)  \; du  \\ = 
-            &\frac{r \sigma_{si}^m \phi_i}{1-\alpha_m} \big( \Delta u -1 + e^{-\Delta u_i} \big)+
-            \frac{\sigma_{si}^m \phi_i}{1-\alpha_a} \big( \Delta u -1 + e^{-\Delta u_i} \big) \\ 
+            &\frac{r \sigma_{si}^m \phi_i}{1-\alpha_m} \big( \Delta u_i -1 + e^{-\Delta u_i} \big)+
+            \frac{\sigma_{si}^m \phi_i}{1-\alpha_a} \big( \Delta u_i -1 + e^{-\Delta u_i} \big) \\ 
             & + \sum_{l = n}^{i-1} \sigma_{sl}^a \phi_l  (e^{u_l} - e^{u_{l-1}})   (e^{-u_{i-1}} - e^{-u_{i}}) \\ 
             & + \sum_{l = 0}^{i-1} r \sigma_{sl}^m \phi_l  (e^{u_l} - e^{u_{l-1}}) (e^{-u_{i-1}} - e^{-u_{i}}) 
         \end{split}
@@ -257,9 +257,9 @@ Our system is parameterized by:
         \begin{align}
         \begin{split}
             \label{eq:balance_group}
-            \big( r \sigma_{ti}^a + \sigma_{ti}^m  \big) &\phi_i \Delta u \\=
-            &\frac{r \sigma_{si}^m \phi_i}{1-\alpha_m} \big( \Delta u -1 + e^{-\Delta u_i} \big)+
-            \frac{\sigma_{si}^a \phi_i}{1-\alpha_a} \big( \Delta u -1 + e^{-\Delta u_i} \big) \\ 
+            \big( r \sigma_{ti}^a + \sigma_{ti}^m  \big) &\phi_i \Delta u_i \\=
+            &\frac{r \sigma_{si}^m \phi_i}{1-\alpha_m} \big( \Delta u_i -1 + e^{-\Delta u_i} \big)+
+            \frac{\sigma_{si}^a \phi_i}{1-\alpha_a} \big( \Delta u_i -1 + e^{-\Delta u_i} \big) \\ 
             & + \sum_{l = n}^{i-1} \sigma_{sl}^a \phi_l  (e^{u_l} - e^{u_{l-1}})   (e^{-u_{i-1}} - e^{-u_{i}}) \\ 
             & + \sum_{l = 0}^{i-1} r \sigma_{sl}^m \phi_l  (e^{u_l} - e^{u_{l-1}}) (e^{-u_{i-1}} - e^{-u_{i}}) ,
         \end{split}
@@ -271,9 +271,9 @@ Our system is parameterized by:
         \begin{split}
             \label{eq:ltri}
             \bigg[ 
-                \bigg( r \sigma_{ti}^a + \sigma_{ti}^m  \bigg) \Delta u  - 
+                \bigg( r \sigma_{ti}^a + \sigma_{ti}^m  \bigg) \Delta u_i  - 
                 \bigg( \frac{r \sigma_{si}^m }{1-\alpha_m} - \frac{\sigma_{si}^a }{1-\alpha_a}  \bigg)
-                \bigg( \Delta u -1 + e^{-\Delta u_i} \bigg) 
+                \bigg( \Delta u_i -1 + e^{-\Delta u_i} \bigg) 
             \bigg] \phi_i \\ =
               \sum_{l = n}^{i-1} \sigma_{sl}^a \phi_l  (e^{u_l} - e^{u_{l-1}})   (e^{-u_{i-1}} - e^{-u_{i}}) \\ 
             + \sum_{l = 0}^{i-1} r \sigma_{sl}^m \phi_l  (e^{u_l} - e^{u_{l-1}}) (e^{-u_{i-1}} - e^{-u_{i}}),
@@ -291,9 +291,9 @@ Our system is parameterized by:
                 + \sum_{l = 0}^{i-1} r \sigma_{sl}^m \phi_l  (e^{u_l} - e^{u_{l-1}}) (e^{-u_{i-1}} - e^{-u_{i}})
             }
             {  
-                \bigg( r \sigma_{ti}^a + \sigma_{ti}^m  \bigg) \Delta u  - 
+                \bigg( r \sigma_{ti}^a + \sigma_{ti}^m  \bigg) \Delta u_i  - 
                 \bigg( \frac{r \sigma_{si}^m }{1-\alpha_m} - \frac{\sigma_{si}^a }{1-\alpha_a}  \bigg)
-                \bigg( \Delta u -1 + e^{-\Delta u_i} \bigg) 
+                \bigg( \Delta u_i -1 + e^{-\Delta u_i} \bigg) 
              }
         \end{split}
         \end{align}
@@ -308,12 +308,12 @@ Our system is parameterized by:
         \begin{align}
         \begin{split}
             \label{eq:balance_group-1}
-            \big( r \sigma_{t1}^a + \sigma_{t1}^m  \big) \phi_1 \Delta u &=
+            \big( r \sigma_{t1}^a + \sigma_{t1}^m  \big) \phi_1 \Delta u_1 &=
             \bigg( \frac{r \sigma_{p}^m }{1-\alpha_m} - \frac{\sigma_{p}^a }{1-\alpha_a} \bigg)
             \; \bigg[ -e^{-(u-u')} \bigg]_{u' = u_0}^{u'= - \infty}
                \\ &+ 
             \bigg( \frac{r \sigma_{s1}^m }{1-\alpha_m} - \frac{\sigma_{s1}^a }{1-\alpha_a}  \bigg)
-            \bigg( \Delta u -1 + e^{-\Delta u_1} \bigg) 
+            \bigg( \Delta u_1 -1 + e^{-\Delta u_1} \bigg) 
         \end{split}
         \end{align}
         
@@ -326,9 +326,9 @@ Our system is parameterized by:
             \frac{
             \frac{r \sigma_{p}^m }{1-\alpha_m} - \frac{\sigma_{p}^a }{1-\alpha_a} }
             {  
-                \big( r \sigma_{t1}^a + \sigma_{t1}^m  \big) \Delta u - 
+                \big( r \sigma_{t1}^a + \sigma_{t1}^m  \big) \Delta u_1 - 
             \bigg( \frac{r \sigma_{s1}^m }{1-\alpha_m} - \frac{\sigma_{s1}^a }{1-\alpha_a}  \bigg)
-            \bigg( \Delta u -1 + e^{-\Delta u_1} \bigg) 
+            \bigg( \Delta u_1 -1 + e^{-\Delta u_1} \bigg) 
             }
         \end{split}
         \end{align}
@@ -351,9 +351,9 @@ Our system is parameterized by:
         enough to have constant cross sections over the resolved resonance region of the absorber.
         Note that the above derivation does not require equal lethargy groups.
         Choosing 1 eV and 20 keV as our energy bounds, we have a maximum lethargy of $9.903$.
-        Choosing $\frac{\epsilon_a}{\Delta u} = 2e4$, meaning $2e4$ lethargy groups 
+        Choosing $\frac{\epsilon_a}{\Delta u_i} = 2e4$, meaning $2e4$ lethargy groups 
         covering the range of the maximum lethargy gain from the absorber in the problem, 
-        gives us a group width of $\Delta u = 1.776e-5$,
+        gives us a group width of $\Delta u_i = 1.776e-5$,
         which gives us 557,708 groups in the problem lethargy space, if we adjust to a 
         minimum energy of 1.0004753 eV. 
         I'm just going to use 1 eV, because percision is overrated.
