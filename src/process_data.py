@@ -40,7 +40,8 @@ class CrossSection:
         self.E = energy_grid
         self.xs = micro_xs_b
         self.rxn = rxn
-        self.leth = np.zeros(len(self.E))
+        self.leth_boundaries = np.zeros(len(self.E) + 1)
+        self.leth_midpoints = np.zeros(len(self.E) )
 
     def indexFromLeth(leth):
         return (np.abs(self.leth - leth)).argmin()
@@ -103,15 +104,21 @@ def interpolate_xs_equal_leth(xs, max_en_eV=20000.0, min_en_eV=1.0, num_points=6
     old_xs = np.flip(np.extract(mask, xs.xs))
 
     # setup new energy and lethargy grid structures
-    new_leth = np.linspace(0,np.log(max_en_eV/min_en_eV), num_points)
-    new_E = max_en_eV * np.exp(-1 * new_leth)
+    new_leth = np.linspace(0,np.log(max_en_eV/min_en_eV), num_points + 1)
+
+    # get midpoints of each lethargy group
+    # this is where xs interpolation is evaluated
+    # we also want midpoint leth and energy for plotting purposes
+    leth_midpoints = (new_leth[1:] + new_leth[:-1]) / 2
+    new_E = max_en_eV * np.exp(-1 * leth_midpoints)
 
     # do the interpolation
-    new_xs = np.interp(new_leth, old_leth, old_xs)
+    new_xs = np.interp(leth_midpoints, old_leth, old_xs)
 
     # create and return a new xs object
     new_xs_obj = CrossSection(new_E, new_xs, xs.rxn)
-    new_xs_obj.leth = new_leth
+    new_xs_obj.leth_boundaries = new_leth
+    new_xs_obj.leth_midpoints = leth_midpoints
     return new_xs_obj
 
 def fig_setup():
@@ -140,7 +147,7 @@ def plot_all(xs_directory, name):
     # by lethargy
     f,a = fig_setup()
     for rxn , xs in xs_directory.items():
-        plt.semilogy(xs.leth , xs.xs, label=rxn_str[rxn])
+        plt.semilogy(xs.leth_midpoints , xs.xs, label=rxn_str[rxn])
     plt.xlabel("Lethargy", fontsize=20)
     plt.ylabel("Cross Section [b]", fontsize=20)
     a.tick_params(size=10, labelsize=20)
@@ -190,7 +197,7 @@ def run(args):
     with smart_open(output_fpath) as fh:
         # get common grids from arbitrary reacton in directory
         energy_grid = xs_directory[Reactions.elastic_sc].E
-        leth_grid = xs_directory[Reactions.elastic_sc].leth
+        leth_grid = xs_directory[Reactions.elastic_sc].leth_midpoints
         elastic = xs_directory[Reactions.elastic_sc].xs
         capture = xs_directory[Reactions.rad_cap].xs
         groups = args.numpoints
