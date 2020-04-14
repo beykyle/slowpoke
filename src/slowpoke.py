@@ -29,13 +29,15 @@ class Simulation:
         self.nuclides = nuclides
         self.number_densities = number_densities
 
-class Homogenized2SpeciesSimulation():
+class Homogenized2SpeciesMaterial():
     def __init__(self, moderator, absorber, ratios):
         self.moderator = moderator
         self.absorber = absorber
         self.ratios = ratios
         self.problems = len(ratios)
         self.fluxes = []
+        key = next(iter(moderator.xs))
+        self.egrid = self.moderator.xs[key].E
 
     def get_problem_data(self, idx: int):
         ratio = self.ratios[idx]
@@ -86,11 +88,12 @@ def build_material(root, nuclides):
         rnum = int(ratio_node.get("points"))
         mod_abs_ratio = np.linspace(rmin, rmax, rnum).tolist()
 
-    return Homogenized2SpeciesSimulation(moderator, absorber, mod_abs_ratio)
+    return Homogenized2SpeciesMaterial(moderator, absorber, mod_abs_ratio)
 
 
 def solver(sig_s, sig_t , alpha, u):
-    return np.zeros(len(sig_s[0]))
+    pass
+
 
 def slow_down(simulation):
     # calculate all cross sections and lethargy grid
@@ -105,12 +108,18 @@ def slow_down(simulation):
 
     return(solver(sig_s, sig_t, alpha , u))
 
+def plot_flux(energy, flux):
+    pass
 
-def run_problem(material):
+def run_problem(material, display=False):
     for i in range(material.problems):
         simulation = material.get_problem_data(i)
         flux = slow_down(simulation)
         material.append_result(flux)
+
+    if display:
+        for i in range(material.problems):
+            plot_flux(material.egrid , material.fluxes[i])
 
 
 def parse_args_and_run(argv: list):
@@ -153,7 +162,7 @@ def parse_args_and_run(argv: list):
     root = tree.getroot()
     nuclides = build_nuclide_data(root, input_path, grid)
     material = build_material(root, nuclides)
-    run_problem(material)
+    run_problem(material, display=args.display)
 
 
 if __name__ == "__main__":
