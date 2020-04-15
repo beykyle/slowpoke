@@ -155,6 +155,17 @@ def slow_down(simulation, boundary=BoundaryCondition.asymptotic_scatter_source):
     sig_p = [ N * nuc.pot_scatterxs_b for N , nuc in zip(nums_dens, nucs)  ]
     sig_t = sig_s + sig_a
 
+    num_groups = len(sig_s[0])
+
+    # calculate xs needed by solver
+    num_nuclides = len(sig_s)
+    sig_s = np.vstack(sig_s)
+    sig_s_reduced_summed = np.zeros(num_groups)
+    sig_t_summed = np.zeros(num_groups)
+    for i in range(num_nuclides):
+        sig_s_reduced_summed = sig_s_reduced_summed + sig_s[i] / (1 - alpha[i])
+        sig_t_summed = sig_t_summed + sig_t[i]
+
     # get lethargy grid
     u = nucs[0].xs[RXN.elastic_sc].leth_boundaries
 
@@ -167,7 +178,8 @@ def slow_down(simulation, boundary=BoundaryCondition.asymptotic_scatter_source):
         sum_sig_t = sum( [s[0] for s in sig_t] )
         phi1 = sum_sigp / ((du) * (sum_sig_t) - (sum_sig_s) * (du - 1 + np.exp(-du)) )
 
-
+    du = u[1] - u[0]
+    flux = ksolver(sig_s, alpha, sig_t_summed, sig_s_reduced_summed, u , phi1, du, num_nuclides, num_groups)
 
     # run the solver and retun the flux
  #   return(solver(sig_s, sig_t, alpha , u, phi1))

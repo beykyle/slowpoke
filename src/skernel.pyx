@@ -4,7 +4,7 @@ __email__ = "beykyle@umich.edu"
 import numpy as np
 
 
-def solver_eq_leth(sig_s , alpha , sig_t, sig_s_reduced, u, phi1 , du):
+def solver_eq_leth(sig_s , alpha , sig_t, sig_s_reduced, u, phi1 , du, num_nuclides, num_groups):
     """
     Numerical slowing down solver for arbirary number of nuclides and arbitrary lethargy grid
     @param sig_s          macroscopic scatter xs: list of np arrays, 1 for each nuclide. Size of each array = num groups
@@ -15,14 +15,10 @@ def solver_eq_leth(sig_s , alpha , sig_t, sig_s_reduced, u, phi1 , du):
     @ phi1                flux in first lethargy group
     """
     # set boundary condition
-    num_groups = len(u) - 1 
     p = np.zeros(num_groups)
     p[0] = phi1
 
-    # put sig_s in numpy array
-    num_nuclides = len(sig_s)
-    sig_s = np.vstack(sig_s)
-    
+
     # calculate lowest group that can scatter into current group for each
     max_group_dist = np.array([int(round(np.log(1/a) / du)) for a in alpha ])
 
