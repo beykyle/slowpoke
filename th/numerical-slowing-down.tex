@@ -272,7 +272,7 @@ Our system is parameterized by:
             \label{eq:ltri}
             \bigg[ 
                 \bigg( r \sigma_{ti}^a + \sigma_{ti}^m  \bigg) \Delta u_i  - 
-                \bigg( \frac{r \sigma_{si}^m }{1-\alpha_m} - \frac{\sigma_{si}^a }{1-\alpha_a}  \bigg)
+                \bigg( \frac{r \sigma_{si}^m }{1-\alpha_m} + \frac{\sigma_{si}^a }{1-\alpha_a}  \bigg)
                 \bigg( \Delta u_i -1 + e^{-\Delta u_i} \bigg) 
             \bigg] \phi_i \\ =
               \sum_{l = n}^{i-1} \sigma_{sl}^a \phi_l  (e^{u_l} - e^{u_{l-1}})   (e^{-u_{i-1}} - e^{-u_{i}}) \\ 
@@ -292,7 +292,7 @@ Our system is parameterized by:
             }
             {  
                 \bigg( r \sigma_{ti}^a + \sigma_{ti}^m  \bigg) \Delta u_i  - 
-                \bigg( \frac{r \sigma_{si}^m }{1-\alpha_m} - \frac{\sigma_{si}^a }{1-\alpha_a}  \bigg)
+                \bigg( \frac{r \sigma_{si}^m }{1-\alpha_m} + \frac{\sigma_{si}^a }{1-\alpha_a}  \bigg)
                 \bigg( \Delta u_i -1 + e^{-\Delta u_i} \bigg) 
              }
         \end{split}
@@ -309,10 +309,10 @@ Our system is parameterized by:
         \begin{split}
             \label{eq:balance_group-1}
             \big( r \sigma_{t1}^a + \sigma_{t1}^m  \big) \phi_1 \Delta u_1 &=
-            \bigg( \frac{r \sigma_{p}^m }{1-\alpha_m} - \frac{\sigma_{p}^a }{1-\alpha_a} \bigg)
+            \bigg( \frac{r \sigma_{p}^m }{1-\alpha_m} + \frac{\sigma_{p}^a }{1-\alpha_a} \bigg)
             \; \bigg[ -e^{-(u-u')} \bigg]_{u' = u_0}^{u'= - \infty}
                \\ &+ 
-            \bigg( \frac{r \sigma_{s1}^m }{1-\alpha_m} - \frac{\sigma_{s1}^a }{1-\alpha_a}  \bigg)
+            \bigg( \frac{r \sigma_{si}^m }{1-\alpha_m} + \frac{\sigma_{si}^a }{1-\alpha_a}  \bigg)
             \bigg( \Delta u_1 -1 + e^{-\Delta u_1} \bigg) 
         \end{split}
         \end{align}
@@ -324,10 +324,10 @@ Our system is parameterized by:
             \label{eq:balance_group-1}
             \phi_1  =
             \frac{
-            \frac{r \sigma_{p}^m }{1-\alpha_m} - \frac{\sigma_{p}^a }{1-\alpha_a} }
+            \frac{r \sigma_{p}^m }{1-\alpha_m} -+ \frac{\sigma_{p}^a }{1-\alpha_a} }
             {  
                 \big( r \sigma_{t1}^a + \sigma_{t1}^m  \big) \Delta u_1 - 
-            \bigg( \frac{r \sigma_{s1}^m }{1-\alpha_m} - \frac{\sigma_{s1}^a }{1-\alpha_a}  \bigg)
+            \bigg( \frac{r \sigma_{s1}^m }{1-\alpha_m} + \frac{\sigma_{s1}^a }{1-\alpha_a}  \bigg)
             \bigg( \Delta u_1 -1 + e^{-\Delta u_1} \bigg) 
             }
         \end{split}
@@ -344,7 +344,7 @@ Our system is parameterized by:
         For a typical absorber, U-238, we have 
         $A_a = 236.006$, so we have a
         maximum fractional energy loss in our problem of $\alpha_a = 0.9832$, and 
-        maximum lethargy gain of $\epsilon_m = 1.6949e-2$, from scattering on the absorber. 
+        maximum lethargy gain of $\epsilon_a = 1.6949e-2$, from scattering on the absorber. 
         
         
         The main constraint on the number of groups is that the lethargy groups must be small
