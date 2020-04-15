@@ -12,12 +12,24 @@ import xml.etree.ElementTree as et
 from pathlib import Path
 from enum import Enum
 
+# plottting
+import matplotlib
+from matplotlib import pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib.ticker import MaxNLocator
+import matplotlib.pylab as pylab
+from matplotlib import rc
+from matplotlib.colors import LogNorm
+import matplotlib.font_manager
+
 """
 This module performs numerical neutron slowing down calculations for homogenous mixtures
 """
 
+
 from nuclide import Nuclide
 from process_data import Reactions as RXN
+from skernel import solver_eq_leth as ksolver
 
 class BoundaryCondition(Enum):
     asymptotic_scatter_source = 1
@@ -112,13 +124,13 @@ def solver(sig_s : list, sig_t :list , alpha : list , u , phi1 : float):
         # calculate in-scatter contribution for each nuclide
         for s , a in zip(sig_s, alpha):
             # calculate lowest group that can scatter into current group for current nuclide
-            min_inscatter_group = int(round(i - np.log(1/a) / du))
+            min_inscatter_group = i - int(round(np.log(1/a) / du))
             n = min_inscatter_group if min_inscatter_group > 0 else 0
 
             # increment numerator by the in-scatter contribution from each group
             # from n to i - 1
-            for l in range(n, i-1):
-                numerator = numerator + s[l] * p[l] * (np.exp(u[l]) - np.exp(u[l-1])) * (np.exp(- u[i-1]) - np.exp(- u[i]) )
+            for l in range(n, i):
+                numerator = numerator - s[l] * p[l] * (np.exp(u[l]) - np.exp(u[l-1])) * (np.exp(- u[i-1]) - np.exp(- u[i]) )
 
         # calculate denominator
         # sum group i in scattering cross section over nuclides
@@ -128,12 +140,13 @@ def solver(sig_s : list, sig_t :list , alpha : list , u , phi1 : float):
         # calculate flux in currrent group
         p[i] = numerator / ( (du) * (sum_sig_t) - (sum_sig_s) * (du - 1 + np.exp(-du)) )
 
+    return p
+
 
 def slow_down(simulation, boundary=BoundaryCondition.asymptotic_scatter_source):
     # get problem data
     nucs = simulation.nuclides
     nums_dens = simulation.number_densities
-
 
     # calculate macroscopic xs
     alpha = [nuc.alpha for nuc in nucs]
@@ -152,10 +165,12 @@ def slow_down(simulation, boundary=BoundaryCondition.asymptotic_scatter_source):
         sum_sigp =  sum( [s   /(1 - alpha[i]) for i, s in enumerate(sig_p)] )
         sum_sig_s = sum( [s[0]/(1 - alpha[i]) for i, s in enumerate(sig_s)] )
         sum_sig_t = sum( [s[0] for s in sig_t] )
-        ph1 = sum_sigp / ((du) * (sum_sig_t) - (sum_sig_s) * (du - 1 + np.exp(-du)) )
+        phi1 = sum_sigp / ((du) * (sum_sig_t) - (sum_sig_s) * (du - 1 + np.exp(-du)) )
+
+
 
     # run the solver and retun the flux
-    return(solver(sig_s, sig_t, alpha , u, phi1))
+ #   return(solver(sig_s, sig_t, alpha , u, phi1))
 
 def plot_flux(energy, flux, name):
     f,a = process_data.fig_setup()
@@ -165,7 +180,7 @@ def plot_flux(energy, flux, name):
     a.tick_params(size=10, labelsize=20)
     plt.savefig(name + ".png")
 
-def run_problem(material, display=False):
+def run_problem(material, display=False, out=False, outpath=None):
     for i in range(material.problems):
         print("Running problem 1/" + str(material.problems))
         simulation = material.get_problem_data(i)
@@ -176,6 +191,23 @@ def run_problem(material, display=False):
         for i in range(material.problems):
             name = "problem_" + str(i)
             plot_flux(material.egrid , material.fluxes[i], name)
+    if out:
+        for i in range(material.problems):
+            name = "problem_" + str(i)
+            write_problem_data(outpath, material.egrid, material.fluxes[i], name)
+
+def write_problem_data(path, en, flux, name):
+    if path != None:
+        path = path + (name + ".csv")
+        print("Writing output to " + path)
+    with process_data.smart_open(path) as fh:
+        print(name , file=fh)
+
+        # iterate through the table and print in csv format
+        print("{}, {}".format("Energy [eV]", "Flux [a.u.]"), file=fh)
+
+        for i in range(len(en)):
+            print("{:1.8e}, {:1.8e}".format( en[i], flux[i]), file=fh)
 
 
 def parse_args_and_run(argv: list):
@@ -183,9 +215,9 @@ def parse_args_and_run(argv: list):
     # default args
     current_path = Path(os.getcwd())
     def_out_path = None
-    def_max_energy_eV = 20000.0
+    def_max_energy_eV = 2.0E4
     def_min_energy_eV = 1.0
-    def_gridsize = 600000
+    def_gridsize = 6E5
 
     # argument parsing
     parser = argparse.ArgumentParser(
@@ -213,13 +245,16 @@ def parse_args_and_run(argv: list):
     input_path = Path(args.input_path)
     validate_xml_path(input_path)
     grid = Grid(args.max_energy_eV , args.min_energy_eV, args.gridsize)
+    output_path = args.output_path
+    if output_path != None:
+        output_path = Path(output_path)
+
 
     tree = et.parse(str(input_path))
     root = tree.getroot()
     nuclides = build_nuclide_data(root, input_path, grid)
     material = build_material(root, nuclides)
-    run_problem(material, display=args.display)
-
+    run_problem(material, display=args.display, out=True, outpath=args.output_path)
 
 if __name__ == "__main__":
     parse_args_and_run(sys.argv)

@@ -3,8 +3,6 @@ __email__ = "beykyle@umich.edu"
 
 import numpy as np
 
-def x():
-    pass
 
 def solver_eq_leth(sig_s , alpha , sig_t, sig_s_reduced, u, phi1 , du):
     """
