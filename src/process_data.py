@@ -105,9 +105,9 @@ def interpolate_xs_equal_leth(xs, max_en_eV=20000.0, min_en_eV=1.0, num_points=6
     # and calculate current leth grid
     # flip so lethargy=0 is first
     mask = np.logical_and(xs.E <= max_en_eV , xs.E >= min_en_eV)
-    old_leth = np.flip(np.log(max_en_eV / xs.E))
     old_E = np.flip(np.extract(mask, xs.E))
     old_xs = np.flip(np.extract(mask, xs.xs))
+    old_leth = np.flip(np.log(max_en_eV / old_E))
 
     # setup new energy and lethargy grid structures
     new_leth = np.linspace(0,np.log(max_en_eV/min_en_eV), num_points + 1)
