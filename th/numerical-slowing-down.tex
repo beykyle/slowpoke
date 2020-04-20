@@ -216,8 +216,9 @@ Our system is parameterized by:
             \bigg(  
                 \int_{0}^{u_{i-1}} &r \sigma_s^m(u')\phi(u') \frac{e^{-(u-u')}}{1 - \alpha_m}du'.
             \bigg)  \; du   \\ &=
-            \sum_{l = 0}^{i-1} r \sigma_{sl}^m \phi_l 
+            \frac{1}{1-\alpha_m} \sum_{l = 0}^{i-1} r \sigma_{sl}^m \phi_l 
             \int_{u_{i-1}}^{u_{i}} du \int_{u_{l-1}}^{u_{l}} du' e^{-(u-u')} \\ &=
+            \frac{1}{1-\alpha_m} 
             \sum_{l = 0}^{i-1} r \sigma_{sl}^m \phi_l  (e^{u_l} - e^{u_{l-1}}) (e^{-u_{i-1}} - e^{-u_{i}}) 
          \end{align}
 
@@ -228,7 +229,7 @@ Our system is parameterized by:
             \bigg(  
                 \int_{u - \epsilon_a}^{u_{i-1}} & \sigma_s^a(u')\phi(u') \frac{e^{-(u-u')}}{1 - \alpha_a}du'.
             \bigg)  \; du   \\ &=
-            \sum_{l = n}^{i-1} \sigma_{sl}^a \phi_l  (e^{u_l} - e^{u_{l-1}}) (e^{-u_{i-1}} - e^{-u_{i}}) 
+            \frac{1}{1-\alpha_a} \sum_{l = n}^{i-1} \sigma_{sl}^a \phi_l  (e^{u_l} - e^{u_{l-1}}) (e^{-u_{i-1}} - e^{-u_{i}}) 
          \end{align}
 
          Putting our scattering term together:
@@ -246,8 +247,10 @@ Our system is parameterized by:
             \bigg)  \; du  \\ = 
             &\frac{r \sigma_{si}^m \phi_i}{1-\alpha_m} \big( \Delta u_i -1 + e^{-\Delta u_i} \big)+
             \frac{\sigma_{si}^m \phi_i}{1-\alpha_a} \big( \Delta u_i -1 + e^{-\Delta u_i} \big) \\ 
-            & + \sum_{l = n}^{i-1} \sigma_{sl}^a \phi_l  (e^{u_l} - e^{u_{l-1}})   (e^{-u_{i-1}} - e^{-u_{i}}) \\ 
-            & + \sum_{l = 0}^{i-1} r \sigma_{sl}^m \phi_l  (e^{u_l} - e^{u_{l-1}}) (e^{-u_{i-1}} - e^{-u_{i}}) 
+            & + \frac{1}{1-\alpha_a} 
+                \sum_{l = n}^{i-1} \sigma_{sl}^a \phi_l  (e^{u_l} - e^{u_{l-1}})   (e^{-u_{i-1}} - e^{-u_{i}}) \\ 
+            & + \frac{1}{1-\alpha_m} 
+                \sum_{l = 0}^{i-1} r \sigma_{sl}^m \phi_l  (e^{u_l} - e^{u_{l-1}}) (e^{-u_{i-1}} - e^{-u_{i}}) 
         \end{split}
         \end{align}
 
@@ -260,8 +263,10 @@ Our system is parameterized by:
             \big( r \sigma_{ti}^a + \sigma_{ti}^m  \big) &\phi_i \Delta u_i \\=
             &\frac{r \sigma_{si}^m \phi_i}{1-\alpha_m} \big( \Delta u_i -1 + e^{-\Delta u_i} \big)+
             \frac{\sigma_{si}^a \phi_i}{1-\alpha_a} \big( \Delta u_i -1 + e^{-\Delta u_i} \big) \\ 
-            & + \sum_{l = n}^{i-1} \sigma_{sl}^a \phi_l  (e^{u_l} - e^{u_{l-1}})   (e^{-u_{i-1}} - e^{-u_{i}}) \\ 
-            & + \sum_{l = 0}^{i-1} r \sigma_{sl}^m \phi_l  (e^{u_l} - e^{u_{l-1}}) (e^{-u_{i-1}} - e^{-u_{i}}) ,
+            & + \frac{1}{1-\alpha_a} 
+                \sum_{l = n}^{i-1} \sigma_{sl}^a \phi_l  (e^{u_l} - e^{u_{l-1}})   (e^{-u_{i-1}} - e^{-u_{i}}) \\ 
+            & + \frac{1}{1-\alpha_m} 
+                \sum_{l = 0}^{i-1} r \sigma_{sl}^m \phi_l  (e^{u_l} - e^{u_{l-1}}) (e^{-u_{i-1}} - e^{-u_{i}}) 
         \end{split}
         \end{align}
 
@@ -275,8 +280,10 @@ Our system is parameterized by:
                 \bigg( \frac{r \sigma_{si}^m }{1-\alpha_m} + \frac{\sigma_{si}^a }{1-\alpha_a}  \bigg)
                 \bigg( \Delta u_i -1 + e^{-\Delta u_i} \bigg) 
             \bigg] \phi_i \\ =
-              \sum_{l = n}^{i-1} \sigma_{sl}^a \phi_l  (e^{u_l} - e^{u_{l-1}})   (e^{-u_{i-1}} - e^{-u_{i}}) \\ 
-            + \sum_{l = 0}^{i-1} r \sigma_{sl}^m \phi_l  (e^{u_l} - e^{u_{l-1}}) (e^{-u_{i-1}} - e^{-u_{i}}),
+              \frac{1}{1-\alpha_a} 
+                \sum_{l = n}^{i-1} \sigma_{sl}^a \phi_l  (e^{u_l} - e^{u_{l-1}})   (e^{-u_{i-1}} - e^{-u_{i}}) \\ 
+             + \frac{1}{1-\alpha_m} 
+                \sum_{l = 0}^{i-1} r \sigma_{sl}^m \phi_l  (e^{u_l} - e^{u_{l-1}}) (e^{-u_{i-1}} - e^{-u_{i}}) 
         \end{split}
         \end{align}
 
@@ -287,8 +294,10 @@ Our system is parameterized by:
             \label{eq:soln}
             \phi_i =
             \frac{
+               \frac{1}{1-\alpha_a} 
                 \sum_{l = n}^{i-1} \sigma_{sl}^a \phi_l  (e^{u_l} - e^{u_{l-1}})   (e^{-u_{i-1}} - e^{-u_{i}}) 
-                + \sum_{l = 0}^{i-1} r \sigma_{sl}^m \phi_l  (e^{u_l} - e^{u_{l-1}}) (e^{-u_{i-1}} - e^{-u_{i}})
+             + \frac{1}{1-\alpha_m} 
+                \sum_{l = 0}^{i-1} r \sigma_{sl}^m \phi_l  (e^{u_l} - e^{u_{l-1}}) (e^{-u_{i-1}} - e^{-u_{i}}) 
             }
             {  
                 \bigg( r \sigma_{ti}^a + \sigma_{ti}^m  \bigg) \Delta u_i  - 

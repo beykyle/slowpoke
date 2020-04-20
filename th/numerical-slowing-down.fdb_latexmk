@@ -1,5 +1,5 @@
 # Fdb version 3
-["pdflatex"] 1586919912 "numerical-slowing-down.tex" "numerical-slowing-down.pdf" "numerical-slowing-down" 1586919913
+["pdflatex"] 1587404736 "numerical-slowing-down.tex" "numerical-slowing-down.pdf" "numerical-slowing-down" 1587404736
   "/etc/texmf/web2c/texmf.cnf" 1578594763 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1511824771 3332 103109f5612ad95229751940c61aada0 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1480098698 1004 54797486969f23fa377b128694d548df ""
@@ -61,9 +61,9 @@
   "/usr/share/texmf/web2c/texmf.cnf" 1520210507 32485 c64754543d8ac501bea6e75e209ea521 ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1578594834 2700761 ac0584cc9514ab21918550a6948c4ee2 ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1578594850 4133712 2458135d16e923cbea7c8494f67c9fb6 ""
-  "numerical-slowing-down.aux" 1586919912 229 161e6ded6c488a972c12e60c6eb5f0bf ""
-  "numerical-slowing-down.tex" 1586919911 18159 865afd923b60e497d2a7c145a6d90131 ""
+  "numerical-slowing-down.aux" 1587404736 229 161e6ded6c488a972c12e60c6eb5f0bf ""
+  "numerical-slowing-down.tex" 1587404735 18536 32c924581de29878e857981d3178f294 ""
   (generated)
-  "numerical-slowing-down.log"
   "numerical-slowing-down.aux"
+  "numerical-slowing-down.log"
   "numerical-slowing-down.pdf"
