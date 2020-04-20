@@ -95,6 +95,12 @@ def read_xs_mesh(fpath):
 
 
 def interpolate_xs_equal_leth(xs, max_en_eV=20000.0, min_en_eV=1.0, num_points=600000):
+    ma  = max(xs.E)
+    mi = min(xs.E)
+    if ma < max_en_eV or mi > min_en_eV:
+        print("Warning: extrapolating from xs data set: ")
+        print("User bounds [{:1.6e},{:1.6e}] eV".format(min_en_eV, max_en_eV) )
+        print("Data bounds [{:1.6e},{:1.6e}] eV".format(mi, ma) )
     # limit energy and xs to specified energy grid
     # and calculate current leth grid
     # flip so lethargy=0 is first
