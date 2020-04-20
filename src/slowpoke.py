@@ -29,7 +29,7 @@ This module performs numerical neutron slowing down calculations for homogenous 
 
 from nuclide import Nuclide
 from process_data import Reactions as RXN
-from skernel import solver_eq_leth as ksolver
+#from skernel import solver_eq_leth as ksolver
 
 class BoundaryCondition(Enum):
     asymptotic_scatter_source = 1
@@ -106,43 +106,6 @@ def build_material(root, nuclides):
 
     return Homogenized2SpeciesMaterial(moderator, absorber, mod_abs_ratio)
 
-
-def solver(sig_s : list, sig_t :list , alpha : list , u , phi1 : float):
-    """
-    Numerical slowing down solver for arbirary number of nuclides and arbitrary lethargy grid
-    @param sig_s  macroscopic scatter xs: list of np arrays, 1 for each nuclide. Size of each array = num groups
-    @param sig_t  macroscopic total xs: list of np arrays, 1 for each nuclide. Size of each array = num groups
-    @param alpha  max fractional energy loss from elastic scatter: list of floats, 1 for each nuclide
-    @ param u     lethargy grid: np array, size = size of cross section arrays + 1
-    @ phi1        flux in first lethargy group
-    """
-    p = np.zeros(len(u) - 1)
-    p[0] = phi1
-    for i in range(1,len(p)):
-        du = u[i] - u[i-1]
-        numerator = 0.0
-        # calculate in-scatter contribution for each nuclide
-        for s , a in zip(sig_s, alpha):
-            # calculate lowest group that can scatter into current group for current nuclide
-            min_inscatter_group = i - int(round(np.log(1/a) / du))
-            n = min_inscatter_group if min_inscatter_group > 0 else 0
-
-            # increment numerator by the in-scatter contribution from each group
-            # from n to i - 1
-            for l in range(n, i):
-                numerator = numerator - s[l] * p[l] * (np.exp(u[l]) - np.exp(u[l-1])) * (np.exp(- u[i-1]) - np.exp(- u[i]) )
-
-        # calculate denominator
-        # sum group i in scattering cross section over nuclides
-        sum_sig_s = sum( [s[i]/(1 - alpha[j]) for j, s in enumerate(sig_s)] )
-        # sum group i total cross section over nuclides
-        sum_sig_t = sum( [s[i] for s in sig_t] )
-        # calculate flux in currrent group
-        p[i] = numerator / ( (du) * (sum_sig_t) - (sum_sig_s) * (du - 1 + np.exp(-du)) )
-
-    return p
-
-
 def slow_down(simulation, boundary=BoundaryCondition.asymptotic_scatter_source):
     # get problem data
     nucs = simulation.nuclides
@@ -157,6 +120,9 @@ def slow_down(simulation, boundary=BoundaryCondition.asymptotic_scatter_source):
 
     num_groups = len(sig_s[0])
 
+    # get lethargy grid
+    u = nucs[0].xs[RXN.elastic_sc].leth_boundaries
+
     # calculate xs needed by solver
     num_nuclides = len(sig_s)
     sig_s = np.vstack(sig_s)
@@ -166,23 +132,29 @@ def slow_down(simulation, boundary=BoundaryCondition.asymptotic_scatter_source):
         sig_s_reduced_summed = sig_s_reduced_summed + sig_s[i] / (1 - alpha[i])
         sig_t_summed = sig_t_summed + sig_t[i]
 
-    # get lethargy grid
-    u = nucs[0].xs[RXN.elastic_sc].leth_boundaries
+    du = u[1] - u[0]
 
     # calculate group 1 flux
     phi1 = 0
     if ( boundary == BoundaryCondition.asymptotic_scatter_source ):
-        du = u[1] - u[0]
         sum_sigp =  sum( [s   /(1 - alpha[i]) for i, s in enumerate(sig_p)] )
-        sum_sig_s = sum( [s[0]/(1 - alpha[i]) for i, s in enumerate(sig_s)] )
-        sum_sig_t = sum( [s[0] for s in sig_t] )
-        phi1 = sum_sigp / ((du) * (sum_sig_t) - (sum_sig_s) * (du - 1 + np.exp(-du)) )
+        phi1 = sum_sigp / ((du) * (sig_t_summed[0]) - (sig_s_reduced_summed[0]) * (du - 1 + np.exp(-du)) )
 
-    du = u[1] - u[0]
-    flux = ksolver(sig_s, alpha, sig_t_summed, sig_s_reduced_summed, u , phi1, du, num_nuclides, num_groups)
+    # set boundary condition
+    p = np.zeros(num_groups)
+    p[0] = phi1
+    print(p)
 
-    # run the solver and retun the flux
- #   return(solver(sig_s, sig_t, alpha , u, phi1))
+    # calculate lowest group that can scatter into current group for each
+    max_group_dist = np.array([int(round(np.log(1/a) / du)) for a in alpha ])
+
+    # precompute exponential factors
+    efn = np.exp(-1*u[1:]) - np.exp(-1*u[:1])
+    efp = np.exp(u[1:]) - np.exp(u[:1])
+
+    flux = np.zeros(len(u) -1)
+    return flux
+
 
 def plot_flux(energy, flux, name):
     f,a = process_data.fig_setup()
@@ -198,6 +170,8 @@ def run_problem(material, display=False, out=False, outpath=None):
         simulation = material.get_problem_data(i)
         flux = slow_down(simulation)
         material.append_result(flux)
+        print(flux)
+        print(material.egrid)
 
     if display:
         for i in range(material.problems):
