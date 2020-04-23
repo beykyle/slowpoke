@@ -8,6 +8,7 @@ import sys
 import os
 import argparse
 import numpy as np
+from numpy.linalg import multi_dot
 import xml.etree.ElementTree as et
 from pathlib import Path
 from enum import Enum
@@ -40,29 +41,6 @@ class Grid:
         self.min = gmin
         self.size = sz
 
-class Simulation:
-    def __init__(self, nuclides : list, number_densities: list):
-        self.nuclides = nuclides
-        self.number_densities = number_densities
-
-class Homogenized2SpeciesMaterial():
-    def __init__(self, moderator, absorber, ratios):
-        self.moderator = moderator
-        self.absorber = absorber
-        self.ratios = ratios
-        self.problems = len(ratios)
-        self.fluxes = []
-        key = next(iter(moderator.xs))
-        self.egrid = self.moderator.xs[key].E
-
-    def get_problem_data(self, idx: int):
-        ratio = self.ratios[idx]
-        return Simulation([self.absorber, self.moderator] , [1. , ratio])
-
-    def append_result(self, flux):
-        self.fluxes.append(flux)
-
-
 def validate_xml_path(input_path):
     if not input_path.is_file():
         print("Input path must point to a valid xml file, completely specifying a material")
@@ -78,111 +56,107 @@ def build_nuclide_data(xml_root, input_path, grid):
 
     return nuclides
 
-def build_material(root, nuclides):
-    mat_node = root.find("material")
-    sim_type = mat_node.get("type")
-
-    if sim_type != "homogenized_moderator_absorber":
-        print("Unkown simulation type " + sim_type)
-        exit(1)
-
-    # get nuclides
-    mod_name = mat_node.get("moderator")
-    abs_name = mat_node.get("absorber")
-    moderator = [nuclide for nuclide in nuclides if nuclide.name == mod_name][0]
-    absorber  = [nuclide for nuclide in nuclides if nuclide.name == abs_name][0]
-
-    # get number density ratios
-    mod_abs_ratio_str = mat_node.get("mod_to_abs_ratio")
-    mod_abs_ratio = []
-    if (mod_abs_ratio_str != None):
-        mod_abs_ratio = [float(mod_abs_ratio_str)]
-    else:
-        ratio_node = mat_node.find("mod_to_abs_ratio")
-        rmin = float(ratio_node.get("min"))
-        rmax = float(ratio_node.get("max"))
-        rnum = int(ratio_node.get("points"))
-        mod_abs_ratio = np.linspace(rmin, rmax, rnum).tolist()
-
-    return Homogenized2SpeciesMaterial(moderator, absorber, mod_abs_ratio)
-
-def slow_down(simulation, boundary=BoundaryCondition.asymptotic_scatter_source):
-    # get problem data
-    nucs = simulation.nuclides
-    nums_dens = simulation.number_densities
-
-    # calculate macroscopic xs
-    alpha = [nuc.alpha for nuc in nucs]
-    sig_s = [ N * nuc.xs[RXN.elastic_sc].xs for N , nuc in zip(nums_dens, nucs)]
-    sig_a = [ N * nuc.xs[RXN.rad_cap].xs    for N , nuc in zip(nums_dens, nucs)]
-    sig_p = [ N * nuc.pot_scatterxs_b for N , nuc in zip(nums_dens, nucs)  ]
-    sig_t = sig_s + sig_a
-
-    num_groups = len(sig_s[0])
-
-    # get lethargy grid
-    u = nucs[0].xs[RXN.elastic_sc].leth_boundaries
-
-    # calculate xs needed by solver
-    num_nuclides = len(sig_s)
-    sig_s = np.vstack(sig_s)
-    sig_s_reduced_summed = np.zeros(num_groups)
-    sig_t_summed = np.zeros(num_groups)
-    for i in range(num_nuclides):
-        sig_s_reduced_summed = sig_s_reduced_summed + sig_s[i] / (1 - alpha[i])
-        sig_t_summed = sig_t_summed + sig_t[i]
-
-    du = u[1] - u[0]
-
-    # calculate group 1 flux
-    phi1 = 0
-    if ( boundary == BoundaryCondition.asymptotic_scatter_source ):
-        sum_sigp =  sum( [s   /(1 - alpha[i]) for i, s in enumerate(sig_p)] )
-        phi1 = sum_sigp / ((du) * (sig_t_summed[0]) - (sig_s_reduced_summed[0]) * (du - 1 + np.exp(-du)) )
-
-    # set boundary condition
-    p = np.zeros(num_groups)
-    p[0] = phi1
-    print(p)
+def skernel_const_gsize(in_scatter_source, sig_p_red, denom, alpha, du, phi):
 
     # calculate lowest group that can scatter into current group for each
-    max_group_dist = np.array([int(round(np.log(1/a) / du)) for a in alpha ])
+    # TODO for now, we are assuming constant groupwidth for speed
+    max_group_dist = np.array( [int(round(np.log(1/a) / du)) for a in alpha[:] ])
 
-    # precompute exponential factors
-    efn = np.exp(-1*u[1:]) - np.exp(-1*u[:1])
-    efp = np.exp(u[1:]) - np.exp(u[:1])
+    (num_nuclides, num_groups) = in_scatter_source.shape
 
-    flux = np.zeros(len(u) -1)
-    return flux
+    for i in np.arange(1,num_groups):
+        phi[i] =  0
+        for nuc in np.arange(0,num_nuclides):
+            min_g = i - max_group_dist[nuc]
+            leftover = 0
+            if min_g < 0:
+                leftover = -min_g
+                min_g = 0
 
+            back_idx = np.arange(i,i+leftover)
+            asym_scat_src = sig_p_red[nuc] * np.sum( (np.exp(-(back_idx-1)*du)*(1-np.exp(-du))**2) )
+            phi[i] = phi[i] + np.dot( in_scatter_source[nuc][min_g:i] , phi[min_g:i] ) + asym_scat_src
 
-def plot_flux(energy, flux, name):
+        phi[i] = phi[i] / denom[i]
+
+    return phi
+
+def slow_down(nuclides, ratios, display=False, out=False, outpath=None):
+
+    # get microscopic xs
+    alpha = np.array([nuc.alpha for nuc in nuclides])
+    sig_s = np.array( [nuc.xs[RXN.elastic_sc].xs for nuc in nuclides ])
+    sig_a = np.array( [nuc.xs[RXN.rad_cap].xs for nuc in nuclides ])
+
+    # get lethargy grid
+    u = nuclides[0].xs[RXN.elastic_sc].leth_boundaries
+    du = u[1:] - u[:-1]
+    egrid = nuclides[0].xs[RXN.elastic_sc].E
+    num_groups = len(u)-1
+
+    # precompute exponential factors and bin widths
+    exp_der = np.exp(-1*u[:-2]) + np.exp(-1*u[2:]) - 2 * np.exp(-1*u[1:-1])
+
+    flx = {}
+    save = True
+    for i in range(len(ratios)):
+        print("Running problem " + str(i))
+        # new flux
+        p = np.zeros(num_groups)
+        sig_t_all = np.zeros(num_groups)
+
+        # compute xs in form needed by solver
+        sig_p = np.array( [n*nuc.pot_scatterxs_b/(1-a) for nuc,a,n in zip(nuclides,alpha,ratios[i])] )
+        sig_s_red = np.vstack([n*s/(1-a) for s,a,n in zip(sig_s,alpha,ratios[i])])
+        sig_p_red = np.vstack([n*s/(1-a) for s,a,n in zip(sig_p,alpha,ratios[i])])
+        sig_s_red_all = np.sum(sig_s_red, axis=0)
+        for j in range(0,len(alpha)):
+            sig_t_all = sig_t_all + ratios[i][j] * (sig_s[j] + sig_a[j])
+
+        # precompute denominator
+        denom = np.multiply(sig_t_all,du) - np.multiply(sig_s_red_all, du - 1 + np.exp(-1* du))
+
+        # precompute scattering sources
+        in_scatter_source = sig_s_red[:,:-1] * exp_der
+
+        # run solver kernel
+        flux = skernel_const_gsize(in_scatter_source, sig_p_red, denom, alpha, du[0], p)
+
+        # display and output
+        if display:
+            name = "problem_" + str(i)
+            plot_flux(egrid , flux, sig_t_all, name)
+        if out:
+            name = "problem_" + str(i)
+            write_problem_data(outpath, egrid, flux, name, ratios[i], nuclides)
+        if save:
+            flx[ratios[i][0]] = flux
+
+    plot_all(egrid , flx, "all")
+
+def plot_flux(energy, flux, sig_t_all, name):
     f,a = process_data.fig_setup()
-    plt.semilogx(energy, flux)
+    plt.semilogx(energy, flux, label="$\Phi$")
+    plt.semilogx(energy, sig_t_all * max(flux)/max(sig_t_all), label=r"$\Sigma_t$ - scaled")
     plt.xlabel("Energy [eV]", fontsize=20)
     plt.ylabel("Scalar Flux [a.u.]", fontsize=20)
+    plt.legend(fontsize=18)
     a.tick_params(size=10, labelsize=20)
     plt.savefig(name + ".png")
 
-def run_problem(material, display=False, out=False, outpath=None):
-    for i in range(material.problems):
-        print("Running problem 1/" + str(material.problems))
-        simulation = material.get_problem_data(i)
-        flux = slow_down(simulation)
-        material.append_result(flux)
-        print(flux)
-        print(material.egrid)
+def plot_all(energy, fluxes, name):
+    f,a = process_data.fig_setup()
+    for lbl, flx in fluxes.items():
+        label = r"$\frac{N_H}{N_{U238}} = $" + str(lbl)
+        plt.semilogx(energy, flx, label=label)
+    plt.xlabel("Energy [eV]", fontsize=20)
+    plt.ylabel("Scalar Flux [a.u.]", fontsize=20)
+    plt.legend(fontsize=18)
+    a.tick_params(size=10, labelsize=20)
+    plt.savefig(name + ".png")
 
-    if display:
-        for i in range(material.problems):
-            name = "problem_" + str(i)
-            plot_flux(material.egrid , material.fluxes[i], name)
-    if out:
-        for i in range(material.problems):
-            name = "problem_" + str(i)
-            write_problem_data(outpath, material.egrid, material.fluxes[i], name)
 
-def write_problem_data(path, en, flux, name):
+def write_problem_data(path, en, flux, name, ratios, nuclides):
     if path != None:
         path = path + (name + ".csv")
         print("Writing output to " + path)
@@ -190,6 +164,10 @@ def write_problem_data(path, en, flux, name):
         print(name , file=fh)
 
         # iterate through the table and print in csv format
+        print("Nuclides:", file=fh)
+        print([n.name for n in nuclides], file=fh)
+        print("Ratios:", file=fh)
+        print(ratios, file=fh)
         print("{}, {}".format("Energy [eV]", "Flux [a.u.]"), file=fh)
 
         for i in range(len(en)):
@@ -239,8 +217,8 @@ def parse_args_and_run(argv: list):
     tree = et.parse(str(input_path))
     root = tree.getroot()
     nuclides = build_nuclide_data(root, input_path, grid)
-    material = build_material(root, nuclides)
-    run_problem(material, display=args.display, out=True, outpath=args.output_path)
+    r = np.array([[1. ,   1.] ,[2.5 ,   1.] ,[5. ,   1.]])
+    slow_down(nuclides, r, display=args.display, out=True, outpath=args.output_path)
 
 if __name__ == "__main__":
     parse_args_and_run(sys.argv)
