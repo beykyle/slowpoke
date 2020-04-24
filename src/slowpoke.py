@@ -64,7 +64,7 @@ def skernel_const_gsize(in_scatter_source, sig_p_red, denom, alpha, du, phi):
 
     (num_nuclides, num_groups) = in_scatter_source.shape
 
-    for i in np.arange(1,num_groups):
+    for i in np.arange(0,num_groups):
         phi[i] =  0
         for nuc in np.arange(0,num_nuclides):
             min_g = i - max_group_dist[nuc]
@@ -98,6 +98,7 @@ def slow_down(nuclides, ratios, display=False, out=False, outpath=None):
     exp_der = np.exp(-1*u[:-2]) + np.exp(-1*u[2:]) - 2 * np.exp(-1*u[1:-1])
 
     flx = {}
+    sig_t = []
     save = True
     for i in range(len(ratios)):
         print("Running problem " + str(i))
@@ -112,6 +113,8 @@ def slow_down(nuclides, ratios, display=False, out=False, outpath=None):
         sig_s_red_all = np.sum(sig_s_red, axis=0)
         for j in range(0,len(alpha)):
             sig_t_all = sig_t_all + ratios[i][j] * (sig_s[j] + sig_a[j])
+
+        sig_t.append(sig_t_all)
 
         # precompute denominator
         denom = np.multiply(sig_t_all,du) - np.multiply(sig_s_red_all, du - 1 + np.exp(-1* du))
@@ -132,23 +135,23 @@ def slow_down(nuclides, ratios, display=False, out=False, outpath=None):
         if save:
             flx[ratios[i][0]] = flux
 
-    plot_all(egrid , flx, "all")
+    plot_all(egrid , flx, sig_t, "all")
 
 def plot_flux(energy, flux, sig_t_all, name):
     f,a = process_data.fig_setup()
-    plt.semilogx(energy[:-1], flux[:-1], label="$\Phi$")
-    plt.semilogx(energy, sig_t_all * max(flux)/max(sig_t_all), label=r"$\Sigma_t$ - scaled")
+    plt.loglog(energy[:-1], flux[:-1], label="$\Phi$")
+    plt.loglog(energy, sig_t_all * max(flux)/max(sig_t_all), label=r"$\Sigma_t$ - scaled")
     plt.xlabel("Energy [eV]", fontsize=20)
     plt.ylabel("Scalar Flux [a.u.]", fontsize=20)
     plt.legend(fontsize=18)
     a.tick_params(size=10, labelsize=20)
     plt.savefig(name + ".png")
 
-def plot_all(energy, fluxes, name):
+def plot_all(energy, fluxes, sig_t_all, name):
     f,a = process_data.fig_setup()
     for lbl, flx in fluxes.items():
         label = r"$\frac{N_H}{N_{U238}} = $" + str(lbl)
-        plt.semilogx(energy[:-1], flx[:-1], label=label)
+        plt.loglog(energy[:-1], flx[:-1], label=label)
     plt.xlabel("Energy [eV]", fontsize=20)
     plt.ylabel("Scalar Flux [a.u.]", fontsize=20)
     plt.legend(fontsize=18)
