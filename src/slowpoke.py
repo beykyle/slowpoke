@@ -73,7 +73,7 @@ def skernel_const_gsize(in_scatter_source, sig_p_red, denom, alpha, du, phi):
                 leftover = -min_g
                 min_g = 0
 
-            back_idx = np.arange(i,i+leftover)
+            back_idx = np.array([i,i+leftover])
             asym_scat_src = sig_p_red[nuc] * np.sum( (np.exp(-(back_idx-1)*du)*(1-np.exp(-du))**2) )
             phi[i] = phi[i] + np.dot( in_scatter_source[nuc][min_g:i] , phi[min_g:i] ) + asym_scat_src
 
@@ -136,7 +136,7 @@ def slow_down(nuclides, ratios, display=False, out=False, outpath=None):
 
 def plot_flux(energy, flux, sig_t_all, name):
     f,a = process_data.fig_setup()
-    plt.semilogx(energy, flux, label="$\Phi$")
+    plt.semilogx(energy[:-1], flux[:-1], label="$\Phi$")
     plt.semilogx(energy, sig_t_all * max(flux)/max(sig_t_all), label=r"$\Sigma_t$ - scaled")
     plt.xlabel("Energy [eV]", fontsize=20)
     plt.ylabel("Scalar Flux [a.u.]", fontsize=20)
@@ -148,7 +148,7 @@ def plot_all(energy, fluxes, name):
     f,a = process_data.fig_setup()
     for lbl, flx in fluxes.items():
         label = r"$\frac{N_H}{N_{U238}} = $" + str(lbl)
-        plt.semilogx(energy, flx, label=label)
+        plt.semilogx(energy[:-1], flx[:-1], label=label)
     plt.xlabel("Energy [eV]", fontsize=20)
     plt.ylabel("Scalar Flux [a.u.]", fontsize=20)
     plt.legend(fontsize=18)
@@ -170,7 +170,7 @@ def write_problem_data(path, en, flux, name, ratios, nuclides):
         print(ratios, file=fh)
         print("{}, {}".format("Energy [eV]", "Flux [a.u.]"), file=fh)
 
-        for i in range(len(en)):
+        for i in range(len(en)-1):
             print("{:1.8e}, {:1.8e}".format( en[i], flux[i]), file=fh)
 
 
