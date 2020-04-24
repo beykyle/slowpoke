@@ -5,6 +5,8 @@
         <nuclide name="U238"  ZAID="92238"  mass_ratio_n="236.006" potential_scat_b="11.293" xs_path="data/U238.csv"/>  
     </nuclear_data>
 
-    <material type="homogenized_moderator_absorber" moderator="H1" absorber="U238" mod_to_abs_ratio="1.0"/>
+    <material type="homogenized_moderator_absorber" moderator="H1" absorber="U238" mod_to_abs_ratio="2.5"/>
+
+    <mg_xs nuclide="U238" energy_grid_path="data/mg_egrid.csv" flux_path="data/flux.csv"/>
 
 </material_spec>
