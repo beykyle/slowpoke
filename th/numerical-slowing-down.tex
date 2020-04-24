@@ -351,23 +351,23 @@ Our system is parameterized by:
         We can represent this term using potential scattering cross sections $\sigma_p$:
         
         \begin{align}
-            \sum_j \frac{ N_j \sigma_{p}^j }{1-\alpha_j}
-                (e^{u_l} - e^{u_{l-1}})   (e^{-u_{i-1}} - e^{-u_{i}}) 
+            \frac{ N_j \sigma_{p}^j }{1-\alpha_j}
+                (e^{u_i} - e^{u_{i+\epsilon_j/\Delta u}})  (e^{-u_{i-1}} - e^{-u_{i}}) 
         \end{align}
 
-        So that our full equation looks like this, when $\epsilon_j/\Delta u > i$ :
+        So that our full equation looks like this:
         
         \begin{align}
         \begin{split}
             \label{eq:soln}
-            \phi_i =
-                \sum_j \bigg[
+            \phi_i = 
+            \sum_j \bigg[
             \frac{
                 \sum_{l = 0}^{i-1} \frac{ \Sigma_{sl}^j }{1-\alpha_j}  \phi_l  
-                (e^{u_l} - e^{u_{l-1}})   (e^{-u_{i-1}} - e^{-u_{i}}) 
+                (e^{u_l} - e^{u_{l-1}})  
                 +
-                \sum_{l = i-\epsilon_j/\Delta u}^{0} \frac{N_j  \sigma_{p}^j }{1-\alpha_j}  \phi_l  
-                (e^{u_l} - e^{u_{l-1}})   (e^{-u_{i-1}} - e^{-u_{i}}) 
+                 \frac{N_j  \sigma_{p}^j }{1-\alpha_j}  \phi_l  
+                 (e^{u_0} - e^{u_n})   
             }
             {  
                 \Sigma_{ti}^j  \Delta u_i  - 
@@ -378,7 +378,30 @@ Our system is parameterized by:
         \end{split}
         \end{align}
 
-        And looks like \ref{eq:soln} otherwise.
+        which can be cast into a more familiar form
+        
+        \begin{align}
+        \begin{split}
+            \label{eq:soln}
+            \phi_i = 
+            (e^{-u_{i-1}} - e^{-u_{i}}) 
+            \sum_j \bigg[
+            \frac{
+                \sum_{l = 0}^{i-1} \frac{ \Sigma_{sl}^j }{1-\alpha_j}  \phi_l  
+                (e^{u_l} - e^{u_{l-1}})  
+                +
+                 \frac{N_j  \sigma_{p}^j }{1-\alpha_j}  \phi_l  
+                 (e^{u_0} - e^{u_n})   
+            }
+            {  
+                \Sigma_{ti}^j  \Delta u_i  - 
+                \big( \frac{ \Sigma_{si}^j }{1-\alpha_j}  \big)
+            \big( \Delta u_i -1 + e^{-\Delta u_i} \big)  
+             }
+         \bigg]
+        \end{split}
+        \end{align}
+
 
         Now we have everything we need to solve this system numerically, given a set of cross sections.
 
