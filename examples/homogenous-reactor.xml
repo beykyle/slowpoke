@@ -7,6 +7,6 @@
 
     <material type="homogenized_moderator_absorber" moderator="H1" absorber="U238" mod_to_abs_ratio="2.5"/>
 
-    <mg_xs nuclide="U238" energy_grid_path="data/mg_egrid.csv" flux_path="data/flux.csv"/>
+    <mg_xs nuclide="U238" energy_grid_path="data/mg_egrid.csv" flux="NSD"/>
 
 </material_spec>
