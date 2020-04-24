@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2020.1.9)  22 APR 2020 19:35
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2020.1.9)  23 APR 2020 23:08
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -454,9 +454,6 @@ LaTeX Warning: Label `eq:soln' multiply defined.
 
 LaTeX Warning: Label `eq:soln' multiply defined.
 
-
-LaTeX Warning: Label `eq:balance_group-1' multiply defined.
-
 )
 \openout1 = `numerical-slowing-down.aux'.
 
@@ -581,8 +578,8 @@ Overfull \hbox (87.12239pt too wide) detected at line 315
  []
 
 [5]
-Overfull \hbox (0.9144pt too wide) in paragraph at lines 361--366
-\OT1/cmr/m/n/10 groups $[0\OML/cmm/m/it/10 ; ^^O[]=\OT1/cmr/m/n/10 ^^A\OML/cmm/m/it/10 u\OT1/cmr/m/n/10 ]$ rep-re-sent-ing in-scattering from an asymp-totic scat-ter-ing source
+Overfull \hbox (102.49855pt too wide) detected at line 379
+[]
  []
 
 [6] [7] (./numerical-slowing-down.aux)
@@ -591,15 +588,15 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 13281 strings out of 492982
- 277038 string characters out of 6134897
- 313715 words of memory out of 5000000
- 16778 multiletter control sequences out of 15000+600000
+ 13280 strings out of 492982
+ 277018 string characters out of 6134897
+ 313706 words of memory out of 5000000
+ 16777 multiletter control sequences out of 15000+600000
  537256 words of font info for 49 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  55i,19n,36p,10395b,275s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb>
-Output written on numerical-slowing-down.pdf (7 pages, 146012 bytes).
+Output written on numerical-slowing-down.pdf (7 pages, 147575 bytes).
 PDF statistics:
  76 PDF objects out of 1000 (max. 8388607)
  54 compressed objects within 1 object stream

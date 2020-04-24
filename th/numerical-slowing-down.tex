@@ -323,10 +323,11 @@ Our system is parameterized by:
             \phi_i =
                 \sum_j \bigg[
             \frac{
-                \sum_{l = n}^{i-1} \frac{ \Sigma_{sl}^j }{1-\alpha_j}  \phi_l  (e^{u_l} - e^{u_{l-1}})   (e^{-u_{i-1}} - e^{-u_{i}}) 
+                \sum_{l = n}^{i-1} \frac{ \Sigma_{sl}^j }{1-\alpha_j}  \phi_l  
+                (e^{u_l} - e^{u_{l-1}})   (e^{-u_{i-1}} - e^{-u_{i}}) 
             }
             {  
-                \bigg(  \Sigma_{ti}^j  \Delta u_i  - 
+               \Sigma_{ti}^j  \Delta u_i  - 
                 \big( \frac{ \Sigma_{si}^j }{1-\alpha_j}  \big)
             \big( \Delta u_i -1 + e^{-\Delta u_i} \big) 
              }
@@ -334,52 +335,52 @@ Our system is parameterized by:
         \end{split}
         \end{align}
         
-        It is also nice to recast this in a form more commonly recognizable as a finite difference method in energy:
+        
+        However, we've neglected to represent in-scattering from groups with lethargies greater than 
+        $u_0$. Groups with $i < \floor{\epsilon_j/\Delta u}]$ will have an incomplete scattering source - 
+        neutrons can come from groups $[0 , \floor{\epsilon_j/\Delta u}]$, but neutrons at lower
+        energies that are not represented on the gird are neglected. 
+        We will use an asymptotic scattering source , by assuming $\sigma_s(u) = \sigma_p$ and 
+        $\phi(u) = 1$ above $E_0$. 
+        We only care abou the flux shape, and we're well out of the fission range, so this is a good approximation.
+        
+        This means we have an additional source term in the numerator of 
+        lethargy groups $[0,\epsilon_j/\Delta u]$, for each nuclide $j$,
+        representing in-scattering from an asymptotic scattering source from
+        all lethargies below 0.
+        We can represent this term using potential scattering cross sections $\sigma_p$:
+        
+        \begin{align}
+            \sum_j \frac{ N_j \sigma_{p}^j }{1-\alpha_j}
+                (e^{u_l} - e^{u_{l-1}})   (e^{-u_{i-1}} - e^{-u_{i}}) 
+        \end{align}
 
+        So that our full equation looks like this, when $\epsilon_j/\Delta u > i$ :
+        
         \begin{align}
         \begin{split}
             \label{eq:soln}
             \phi_i =
                 \sum_j \bigg[
             \frac{
-                \sum_{l = n}^{i-1} \frac{ \Sigma_{sl}^j }{1-\alpha_j}  \phi_l  \big( e^{-u_{j-1}} +  e^{-u_{j+1}} - 2 e^{-u_j} \big)
+                \sum_{l = 0}^{i-1} \frac{ \Sigma_{sl}^j }{1-\alpha_j}  \phi_l  
+                (e^{u_l} - e^{u_{l-1}})   (e^{-u_{i-1}} - e^{-u_{i}}) 
+                +
+                \sum_{l = i-\epsilon_j/\Delta u}^{0} \frac{N_j  \sigma_{p}^j }{1-\alpha_j}  \phi_l  
+                (e^{u_l} - e^{u_{l-1}})   (e^{-u_{i-1}} - e^{-u_{i}}) 
             }
-            { 
-                \bigg(  \Sigma_{ti}^j  \Delta u_i  - 
+            {  
+                \Sigma_{ti}^j  \Delta u_i  - 
                 \big( \frac{ \Sigma_{si}^j }{1-\alpha_j}  \big)
-            \big( \Delta u_i -1 + e^{-\Delta u_i} \big) 
+            \big( \Delta u_i -1 + e^{-\Delta u_i} \big)  
              }
          \bigg]
         \end{split}
         \end{align}
 
-        Now, we need a boundary condition. 
-        We will use an asymptotic scattering source , by assuming $\sigma_s(u) = \sigma_p$ and 
-        $\phi(u) = 1$ above $E_0$. 
-        We only care abou the flux shape, and we're well out of the fission range, so this is a good approximation.
-        
-        This means we have an additional source term in the numerator of 
-        lethargy groups $[0,\epsilon_j/\Delta u]$
-        representing in-scattering from an asymptotic scattering source from
-        all lethargies below 0.
-        We have the following new term we need to integrate over:
-        
-        \begin{align}
-        \begin{split}
-            \label{eq:balance_group-1}
-        \end{split}
-        \end{align}
-        
-        If we evaluate the integral at $u = u_0$, the lower lethargy boundary of group 1, we simply have:
-        
-        \begin{align}
-        \begin{split}
-            \label{eq:balance_group-1}
-        \end{split}
-        \end{align}
+        And looks like \ref{eq:soln} otherwise.
 
         Now we have everything we need to solve this system numerically, given a set of cross sections.
-
 
         Let's look at some parameters for an example problem.
         Using H-1 as our moderator, we have 
