@@ -2,7 +2,6 @@ __author__ = "Kyle Beyer"
 __email__ = "beykyle@umich.edu"
 
 
-import process_data
 import glob
 import sys
 import os
@@ -28,6 +27,7 @@ This module performs numerical neutron slowing down calculations for homogenous 
 """
 
 
+import process_data
 from nuclide import Nuclide
 from process_data import Reactions as RXN
 #from skernel import solver_eq_leth as ksolver
